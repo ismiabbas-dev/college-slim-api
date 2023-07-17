@@ -40,11 +40,10 @@ $app->get('/room/{id}', function (Request $req, Response $res) {
 $app->post('/room', function (Request $req, Response $res) {
     $db = getDB();
     $type = $req->getParsedBody()['type'] ?? null;
-    $status = $req->getParsedBody()['status'] ?? 1;
     $number = $req->getParsedBody()['number'] ?? 1;
 
 
-    $db->insertRoom($number, $type, $status);
+    $db->insertRoom($number, $type, 1);
 
     $res->getBody()->write(json_encode([
         'message' => 'Room added successfully'
@@ -77,6 +76,10 @@ $app->put('/room/{id}', function (Request $req, Response $res) {
     $res->getBody()->write(json_encode([
         'message' => 'Room updated successfully'
     ]));
+
+    return $res
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
 });
 
 
@@ -100,4 +103,8 @@ $app->delete('/room/{id}', function (Request $req, Response $res) {
     $res->getBody()->write(json_encode([
         'message' => 'Room deleted successfully'
     ]));
+
+    return $res
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
 });

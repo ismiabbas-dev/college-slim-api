@@ -23,6 +23,7 @@ class Room
     public $roomNumber;
     public $roomType;
     public $roomStatus;
+    public $userName;
 }
 
 class User
@@ -470,7 +471,10 @@ class DB
     public function getAllRooms()
     {
 
-        $sql = "SELECT * FROM room";
+        $sql = "SELECT R.*, U.name
+        FROM room R
+                LEFT JOIN booking B on B.roomID = R.roomID
+                LEFT JOIN user U on U.userID = B.userID";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -485,6 +489,7 @@ class DB
                 $room->roomNumber = intval($row['roomNumber']);
                 $room->roomType = $row['roomType'];
                 $room->roomStatus = intval($row['roomStatus']);
+                $room->userName = $row['name'];
 
                 array_push($data, $room);
             }
@@ -530,9 +535,11 @@ class DB
     public function getRoomViaId($id)
     {
 
-        $sql = "SELECT *
-                FROM room
-                WHERE roomID = :id";
+        $sql = "SELECT R.*, U.name
+                    FROM room R
+                            LEFT JOIN booking B on B.roomID = R.roomID
+                            LEFT JOIN user U on U.userID = B.userID
+                    WHERE R.roomID = :id";
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam("id", $id);
@@ -548,6 +555,7 @@ class DB
                 $room->roomNumber = intval($row['roomNumber']);
                 $room->roomType = $row['roomType'];
                 $room->roomStatus = intval($row['roomStatus']);
+                $room->userName = $row['name'];
             }
         }
 
