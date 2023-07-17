@@ -5,14 +5,31 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Response as SlimResponse;
+use App\Utils\JWTMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $app = AppFactory::create();
 
+
 $app->addBodyParsingMiddleware();
 
 $app->addErrorMiddleware(true, true, true);
+
+$jwtMiddleware = new JWTMiddleware('YOUR_SECRET_KEY');
+
+$app->add(function (Request $request, RequestHandler $handler) use ($jwtMiddleware) {
+    return $jwtMiddleware->validateToken($request, $handler);
+});
+
+$app->get('/protected', function (Request $request, Response $response) {
+    $payload = $request->getAttribute('jwtPayload');
+    $userId = $payload->data->userId;
+
+    $response->getBody()->write("Authenticated user with ID: $userId");
+    return $response;
+});
+
 
 function checkToken(Request $request, RequestHandler $handler): Response
 {
