@@ -41,11 +41,10 @@ $app->get('/booking/{id}', function (Request $req, Response $res) {
 
 $app->post('/booking', function (Request $req, Response $res) {
     $db =  getDB();
+    $roomID = $req->getParsedBody()['roomId'] ?? null;
+    $userID = $req->getParsedBody()['userId'] ?? null;
 
-    $roomID = $req->getParsedBody()['roomID'] ?? null;
-    $userID = $req->getParsedBody()['userID'] ?? null;
-
-    $db->insertBooking($roomID, $userID, 1);
+    $db->insertBooking($roomID, $userID, 0);
 
     $res->getBody()->write(json_encode([
         'message' => 'Booking added successfully'
@@ -60,8 +59,8 @@ $app->put('/booking/{id}', function (Request $req, Response $res) {
     $db =  getDB();
 
     $id = $req->getAttribute('id');
-    $roomID = $req->getParsedBody()['roomID'] ?? null;
-    $userID = $req->getParsedBody()['userID'] ?? null;
+    $roomID = $req->getParsedBody()['roomId'] ?? null;
+    $userID = $req->getParsedBody()['userId'] ?? null;
     $status = $req->getParsedBody()['status'] ?? null;
 
     $db->updateBookingViaId($id, $roomID, $userID, $status);

@@ -3,6 +3,8 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use function App\Models\hashPassword;
+
 $app->get('/user', function (Request $req, Response $res) {
     $db = getDB();
     $users = $db->getAllUser();
@@ -79,9 +81,9 @@ $app->post('/user', function (Request $req, Response $res) {
 });
 
 
-$app->put('/user', function (Request $req, Response $res) {
+$app->put('/user/{id}', function (Request $req, Response $res) {
+    $id = $req->getAttribute('id');
     $body = $req->getParsedBody();
-    $id = $body['id'];
 
     if (!$id) {
         $res->getBody()->write(json_encode([
@@ -106,11 +108,11 @@ $app->put('/user', function (Request $req, Response $res) {
             ->withStatus(404);
     }
 
-    $name = $body['name'] ?? $user['name'];
-    $email = $body['email'] ?? $user['email'];
-    $password = $body['password'] ?? $user['password'];
-    $role = $body['role'] ?? $user['role'];
-    $photo = $body['photo'] ?? $user['photo'];
+    $name = $body['name'] ?? $user->name;
+    $email = $body['email'] ?? $user->email;
+    $role = $body['role'] ?? $user->role;
+    $photo = $body['photo'] ?? $user->photo;
+    $password = $body['password'] ?? $user->passwordHash;
 
     $user = $db->updateUserViaId($id, $name, $email, $password, $role, $photo);
 

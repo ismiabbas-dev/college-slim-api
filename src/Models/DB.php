@@ -312,7 +312,12 @@ class DB
     public function getAllBookings()
     {
 
-        $sql = "SELECT * FROM booking";
+        // $sql = "SELECT * FROM booking";
+
+        $sql = "SELECT B.bookingID, B.bookingStatus, R.roomNumber, R.roomID, R.roomType, U.userID, U.name
+                    FROM Booking B 
+                    INNER JOIN Room R on B.RoomID = R.RoomID 
+                    INNER JOIN User U on U.UserID = B.UserID";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -327,6 +332,9 @@ class DB
                 $booking->roomID = intval($row['roomID']);
                 $booking->userID = intval($row['userID']);
                 $booking->bookingStatus = intval($row['bookingStatus']);
+                $booking->userName = $row['name'];
+                $booking->roomNumber = intval($row['roomNumber']);
+                $booking->roomType = $row['roomType'];
 
                 array_push($data, $booking);
             }
@@ -349,6 +357,15 @@ class DB
             $stmt->bindParam("userID", $userID);
             $stmt->bindParam("bookingStatus", $bookingStatus);
 
+            $stmt->execute();
+
+            //if insert was success then update room
+            $sql = "UPDATE room
+                    SET roomStatus = 0
+                    WHERE roomID = :roomID";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam("roomID", $roomID);
             $stmt->execute();
 
             $dbs = new DbStatus();

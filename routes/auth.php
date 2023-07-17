@@ -43,7 +43,8 @@ $app->post('/auth/login', function (Request $req, Response $res) {
     $res->getBody()->write(json_encode([
         'message' => 'Login successful',
         'token' => $token,
-        'id' => $user->userID
+        'id' => $user->userID,
+        'role' => $user->role
     ]));
 
     // $res->getBody()->write(json_encode($user));
