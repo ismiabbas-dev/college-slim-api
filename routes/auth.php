@@ -18,7 +18,7 @@ function generateToken($email, $userID)
     return JWT::encode($payload, 'SECRET_KEY', $algo);
 }
 
-$app->post('/v1/auth/login', function (Request $req, Response $res) {
+$app->post('/auth/login', function (Request $req, Response $res) {
     $body = $req->getParsedBody();
     $email = $body['email'];
     $password = $body['password'];
@@ -75,7 +75,7 @@ $app->post('/auth/register', function (Request $req, Response $res) {
         ->withStatus(200);
 });
 
-$app->get('/v1/auth/token', function (Request $req, Response $res) {
+$app->get('/auth/token', function (Request $req, Response $res) {
 
     $token = generateToken(
         'test400@test.com',

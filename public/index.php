@@ -24,9 +24,18 @@ function getDB()
 
 function isValidToken($token)
 {
+    $db = getDB();
     try {
         $decoded = JWT::decode($token, new Key('SECRET_KEY', 'HS256'));
+
+        $user = $db->getUserViaLogin($decoded->email);
+
+        if (!$user) {
+            return false;
+        }
+
         return $decoded->exp > time();
+
     } catch (ExpiredException $e) {
         return false;
     } catch (BeforeValidException $e) {
@@ -38,8 +47,12 @@ function isValidToken($token)
     }
 }
 
-
 $app = AppFactory::create();
+
+$app->setBasePath('/api/v1');
+
+$app->getContainer();
+
 
 $app->addBodyParsingMiddleware();
 $app->addErrorMiddleware(true, true, true);
@@ -49,22 +62,27 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 });
 
 $app->add(function ($request, $handler) {
+    return $handler->handle($request);
+})->add(function ($request, $handler) {
+    $disableAuthHeader = true;
 
-    $publicRoute = [
-        '/v1/auth/token',
-        '/v1/auth/login',
-        '/v1/auth/register'
+    $publicRoutes = [
+        '/api/v1/auth/token',
+        '/api/v1/auth/login',
+        '/api/v1/auth/register'
     ];
 
-    if (in_array($request->getUri()->getPath(), $publicRoute)) {
+    $path = $request->getUri()->getPath();
+
+    if (in_array($path, $publicRoutes) || $disableAuthHeader) {
         return $handler->handle($request);
     }
 
     if (!$request->hasHeader('Authorization')) {
-        $res = new Response();
-        $res->getBody()->write(json_encode(['error' => 'No token provided']));
+        $response = new Response();
+        $response->getBody()->write(json_encode(['error' => 'No token provided']));
 
-        return $res
+        return $response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus(401);
     }
@@ -72,19 +90,24 @@ $app->add(function ($request, $handler) {
     $token = $request->getHeaderLine('Authorization');
 
     if (!isValidToken($token)) {
-        $res = new Response();
-        $res->getBody()->write(json_encode(['error' => 'Access denied']));
+        $response = new Response();
+        $response->getBody()->write(json_encode(['error' => 'Access denied']));
 
-        return $res
+        return $response
             ->withHeader('Content-Type', 'application/json')
             ->withStatus(401);
     }
 
     $response = $handler->handle($request);
+
+    return $response;
+})->add(function ($request, $handler) {
+    $response = $handler->handle($request);
+
     return $response
-            ->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
 require __DIR__ . '/../routes/booking.php';

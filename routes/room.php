@@ -3,7 +3,7 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-$app->get('/v1/room', function (Request $req, Response $res) {
+$app->get('/room', function (Request $req, Response $res) {
     $db = getDB();
     $rooms = $db->getAllRooms();
 
@@ -14,7 +14,7 @@ $app->get('/v1/room', function (Request $req, Response $res) {
         ->withStatus(200);
 });
 
-$app->get('/v1/room/{id}', function (Request $req, Response $res) {
+$app->get('/room/{id}', function (Request $req, Response $res) {
     $db = getDB();
     $id = $req->getAttribute('id');
 
@@ -37,7 +37,7 @@ $app->get('/v1/room/{id}', function (Request $req, Response $res) {
         ->withStatus(200);
 });
 
-$app->post('/v1/room', function (Request $req, Response $res) {
+$app->post('/room', function (Request $req, Response $res) {
     $db = getDB();
     $type = $req->getParsedBody()['type'] ?? null;
     $status = $req->getParsedBody()['status'] ?? 1;
@@ -55,7 +55,7 @@ $app->post('/v1/room', function (Request $req, Response $res) {
         ->withStatus(201);
 });
 
-$app->put('/v1/room/{id}', function (Request $req, Response $res) {
+$app->put('/room/{id}', function (Request $req, Response $res) {
     $id = $req->getAttribute('id');
     $roomNumber = $req->getParsedBody()['number'] ?? null;
     $roomType = $req->getParsedBody()['type'] ?? null;
@@ -80,7 +80,7 @@ $app->put('/v1/room/{id}', function (Request $req, Response $res) {
 });
 
 
-$app->delete('/v1/room/{id}', function (Request $req, Response $res) {
+$app->delete('/room/{id}', function (Request $req, Response $res) {
     $db = getDB();
 
     $id = $req->getAttribute('id');

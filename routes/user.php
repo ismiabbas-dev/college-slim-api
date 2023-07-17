@@ -3,7 +3,7 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-$app->get('/v1/user', function (Request $req, Response $res) {
+$app->get('/user', function (Request $req, Response $res) {
     $db = getDB();
     $users = $db->getAllUser();
 
@@ -15,7 +15,7 @@ $app->get('/v1/user', function (Request $req, Response $res) {
 });
 
 //get user byId
-$app->get('/v1/user/{id}', function (Request $req, Response $res, $args) {
+$app->get('/user/{id}', function (Request $req, Response $res, $args) {
     $id = $args['id'];
 
     $db = getDB();
@@ -46,7 +46,7 @@ $app->get('/v1/user/{id}', function (Request $req, Response $res, $args) {
         ->withStatus(200);
 });
 
-$app->post('/v1/user', function (Request $req, Response $res) {
+$app->post('/user', function (Request $req, Response $res) {
     $db = getDB();
 
     $name = $req->getParsedBody()['name'] ?? null;
@@ -79,7 +79,7 @@ $app->post('/v1/user', function (Request $req, Response $res) {
 });
 
 
-$app->put('/v1/user', function (Request $req, Response $res) {
+$app->put('/user', function (Request $req, Response $res) {
     $body = $req->getParsedBody();
     $id = $body['id'];
 

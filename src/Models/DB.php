@@ -12,6 +12,9 @@ class Booking
     public $roomID;
     public $userID;
     public $bookingStatus;
+    public $roomNumber;
+    public $roomType;
+    public $userName;
 }
 
 class Room
@@ -368,9 +371,10 @@ class DB
     public function getBookingViaId($id)
     {
 
-        $sql = "SELECT *
-                FROM booking
-                WHERE bookingID = :id";
+        $sql = "SELECT * FROM booking B
+                    INNER JOIN room R on R.roomID = B.roomID
+                    INNER JOIN user U on U.userID = B.userID
+                    WHERE B.bookingID = :id";
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam("id", $id);
@@ -386,6 +390,9 @@ class DB
                 $booking->roomID = intval($row['roomID']);
                 $booking->userID = intval($row['userID']);
                 $booking->bookingStatus = intval($row['bookingStatus']);
+                $booking->roomNumber = intval($row['roomNumber']);
+                $booking->roomType = $row['roomType'];
+                $booking->userName = $row['name'];
             }
         }
 

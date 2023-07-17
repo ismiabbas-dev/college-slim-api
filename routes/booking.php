@@ -3,7 +3,7 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-$app->get('/v1/booking', function (Request $req, Response $res) {
+$app->get('/booking', function (Request $req, Response $res) {
     $db = getDB();
 
     $bookings = $db->getAllBookings();
@@ -16,7 +16,7 @@ $app->get('/v1/booking', function (Request $req, Response $res) {
 });
 
 
-$app->get('/v1/booking/{id}', function (Request $req, Response $res) {
+$app->get('/booking/{id}', function (Request $req, Response $res) {
     $db = getDB();
     $id = $req->getAttribute('id');
 
@@ -39,7 +39,7 @@ $app->get('/v1/booking/{id}', function (Request $req, Response $res) {
         ->withStatus(200);
 });
 
-$app->post('/v1/booking', function (Request $req, Response $res) {
+$app->post('/booking', function (Request $req, Response $res) {
     $db =  getDB();
 
     $roomID = $req->getParsedBody()['roomID'] ?? null;
@@ -56,7 +56,7 @@ $app->post('/v1/booking', function (Request $req, Response $res) {
         ->withStatus(201);
 });
 
-$app->put('/v1/booking/{id}', function (Request $req, Response $res) {
+$app->put('/booking/{id}', function (Request $req, Response $res) {
     $db =  getDB();
 
     $id = $req->getAttribute('id');
@@ -76,7 +76,7 @@ $app->put('/v1/booking/{id}', function (Request $req, Response $res) {
 });
 
 
-$app->delete('/v1/booking/{id}', function (Request $req, Response $res) {
+$app->delete('/booking/{id}', function (Request $req, Response $res) {
     $db =  getDB();
 
     $id = $req->getAttribute('id');
