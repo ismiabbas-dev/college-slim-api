@@ -2,12 +2,28 @@
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use App\Models\DB;
+use Firebase\JWT\JWT;
 
-$app->post('/auth/login', function (Request $req, Response $res) {
+function generateToken($email, $password, $userID)
+{
+    $payload = [
+        'email' => $email,
+        'password' => $password,
+        'userID' => $userID,
+        'iat' => time(),
+        'exp' => time() + 60 * 60 * 24
+    ];
+
+    $algo = 'HS256';
+
+    return JWT::encode($payload, 'SECRET_KEY', $algo);
+}
+
+$app->post('/v1/auth/login', function (Request $req, Response $res) {
     $body = $req->getParsedBody();
     $email = $body['email'];
     $password = $body['password'];
+
 
     $db = getDB();
     $user = $db->getUserViaLogin($email);
@@ -23,10 +39,15 @@ $app->post('/auth/login', function (Request $req, Response $res) {
             ->withStatus(404);
     }
 
+    $token = generateToken($email, $password, $user->userID);
+
     $res->getBody()->write(json_encode([
         'message' => 'Login successful',
-        'user' => $user
+        'token' => $token,
+        'id' => $user->userID
     ]));
+
+    // $res->getBody()->write(json_encode($user));
 
     return $res
         ->withHeader('Content-Type', 'application/json')

@@ -2,14 +2,8 @@
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use App\Models\DB;
 
-function getDB()
-{
-    return new DB('localhost', 'root', 'root12345', 'college');
-}
-
-$app->get('/user', function (Request $req, Response $res) {
+$app->get('/v1/user', function (Request $req, Response $res) {
     $db = getDB();
     $users = $db->getAllUser();
 
@@ -20,7 +14,39 @@ $app->get('/user', function (Request $req, Response $res) {
         ->withStatus(200);
 });
 
-$app->post('/user', function (Request $req, Response $res) {
+//get user byId
+$app->get('/v1/user/{id}', function (Request $req, Response $res, $args) {
+    $id = $args['id'];
+
+    $db = getDB();
+    $user = $db->getUserViaId($id);
+
+    if (!$user) {
+        $res->getBody()->write(json_encode([
+            'message' => 'User not found'
+        ]));
+
+        return $res
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(404);
+    }
+
+    $response = array(
+        'id' => $user->userID,
+        'name' => $user->name,
+        'email' => $user->email,
+        'role' => $user->role,
+        'photo' => $user->photo
+    );
+
+    $res->getBody()->write(json_encode($response));
+
+    return $res
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
+});
+
+$app->post('/v1/user', function (Request $req, Response $res) {
     $db = getDB();
 
     $name = $req->getParsedBody()['name'] ?? null;
@@ -53,7 +79,7 @@ $app->post('/user', function (Request $req, Response $res) {
 });
 
 
-$app->put('/user', function (Request $req, Response $res) {
+$app->put('/v1/user', function (Request $req, Response $res) {
     $body = $req->getParsedBody();
     $id = $body['id'];
 
