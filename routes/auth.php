@@ -4,11 +4,10 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Firebase\JWT\JWT;
 
-function generateToken($email, $password, $userID)
+function generateToken($email, $userID)
 {
     $payload = [
         'email' => $email,
-        'password' => $password,
         'userID' => $userID,
         'iat' => time(),
         'exp' => time() + 60 * 60 * 24
@@ -69,6 +68,22 @@ $app->post('/auth/register', function (Request $req, Response $res) {
     $res->getBody()->write(json_encode([
         'message' => 'User creation successful',
         'user' => $user
+    ]));
+
+    return $res
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
+});
+
+$app->get('/v1/auth/token', function (Request $req, Response $res) {
+
+    $token = generateToken(
+        'test400@test.com',
+        1
+    );
+
+    $res->getBody()->write(json_encode([
+        'token' => $token
     ]));
 
     return $res
