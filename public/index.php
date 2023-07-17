@@ -2,7 +2,6 @@
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\MiddlewareInterface as Middleware;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Response as SlimResponse;
@@ -14,18 +13,6 @@ $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 
 $app->addErrorMiddleware(true, true, true);
-
-function addBasePath(Request $request, RequestHandler $handler): Response
-{
-    $uri = $request->getUri();
-    $basePath = '/api/v1';
-
-    $uri = $uri->withPath($basePath . $uri->getPath());
-    $request = $request->withUri($uri);
-
-    $response = $handler->handle($request);
-    return $response;
-}
 
 function checkToken(Request $request, RequestHandler $handler): Response
 {
@@ -42,14 +29,25 @@ function checkToken(Request $request, RequestHandler $handler): Response
     }
 }
 
-$app->addRoutingMiddleware();
+$app->get('/test', function (Request $request, Response $response, $args) {
 
-$app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello world!");
-    return $response;
+
+    $response->getBody()->write(json_encode([
+        'name' => 'Slim 4 Skeleton',
+        'version' => '1.0.0',
+        'status' => 'OK',
+        'message' => 'API is running'
+    ]));
+    return $response
+        ->withHeader('Content-Type', 'application/json')
+        ->withStatus(200);
 });
 
+require __DIR__ . '/../routes/booking.php';
+require __DIR__ . '/../routes/room.php';
+require __DIR__ . '/../routes/auth.php';
+require __DIR__ . '/../routes/user.php';
+
 $app->add('checkToken');
-$app->add('addBasePath');
 
 $app->run();
