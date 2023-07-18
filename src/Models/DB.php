@@ -244,10 +244,9 @@ class DB
         $sql = "UPDATE user
                 SET name = :name,
                     email = :email,
-                    password = :password,
                     role = :role,
                     photo = :photo
-                WHERE userID = :id";
+                    WHERE userID = :id";
 
         try {
             $stmt = $this->db->prepare($sql);

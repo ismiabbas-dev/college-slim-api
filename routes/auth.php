@@ -23,10 +23,24 @@ $app->post('/auth/login', function (Request $req, Response $res) {
     $email = $body['email'];
     $password = $body['password'];
 
-
     $db = getDB();
     $user = $db->getUserViaLogin($email);
     $db->close();
+
+    $status = password_verify($password, $user->passwordHash);
+
+    if(!password_verify($password, $user->passwordHash)) {
+        $res->getBody()->write(json_encode([
+            'message' => 'Invalid username or password',
+            'status' => $status,
+            'password' => $password,
+            'hash' => $user->passwordHash
+        ]));
+
+        return $res
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(401);
+    }
 
     if (!$user) {
         $res->getBody()->write(json_encode([
