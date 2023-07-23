@@ -66,6 +66,7 @@ $app->add(function ($request, $handler) {
 })->add(function ($request, $handler) {
     $disableAuthHeader = true;
 
+    // this route will be ignored for Authorization header checking
     $publicRoutes = [
         '/api/v1/auth/token',
         '/api/v1/auth/login',
@@ -110,6 +111,13 @@ $app->add(function ($request, $handler) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
+$app->get('/', function ($request, $response) {
+    $response->getBody()->write('Hello world!');
+
+    return $response;
+});
+
+// Routes are separated into files
 require __DIR__ . '/../routes/booking.php';
 require __DIR__ . '/../routes/room.php';
 require __DIR__ . '/../routes/auth.php';
