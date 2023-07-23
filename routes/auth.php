@@ -73,7 +73,7 @@ $app->post('/auth/register', function (Request $req, Response $res) {
     $name = $body['name'];
     $email = $body['email'];
     $password = $body['password'];
-    $role = $body['role'] ?? 'user';
+    $role = $body['role'] ?? 'member';
     $photo = $body['photo'] ?? null;
 
     $db = getDB();
