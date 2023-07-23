@@ -252,7 +252,6 @@ class DB
             $stmt = $this->db->prepare($sql);
             $stmt->bindParam("name", $name);
             $stmt->bindParam("email", $email);
-            $stmt->bindParam("password", $passwordhash);
             $stmt->bindParam("role", $role);
             $stmt->bindParam("photo", $photo);
             $stmt->bindParam("id", $id);
